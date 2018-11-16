@@ -1,5 +1,6 @@
 
 import hxd.Key;
+import h2d.Text.Align;
 
 class Bunny extends h2d.Object {
 
@@ -16,6 +17,7 @@ class Bunny extends h2d.Object {
 
 class Bunnymark extends hxd.App {
 
+	var textBackground : h2d.Graphics;
 	var text : h2d.Text;
 	var tile : h2d.Tile;
 	var bunnies : h2d.Object;
@@ -36,9 +38,12 @@ class Bunnymark extends hxd.App {
 		bunnyHeight = tile.height;
 		bunnies = new h2d.Object( s2d );
 
-		text = new h2d.Text( hxd.res.DefaultFont.get(), s2d );
-		text.textColor = 0xFFFFFF;
-		text.x = text.y = 10;
+		textBackground = new h2d.Graphics( s2d );
+		text = new h2d.Text( hxd.res.DefaultFont.get(), textBackground );
+		text.text = "BUNNYMARK";
+		text.textColor = 0x000000;
+		text.x = 2;
+		textBackground.y = maxY - text.textHeight;
 
 		addBunnies();
 
@@ -48,7 +53,7 @@ class Bunnymark extends hxd.App {
 	function addBunnies() {
 		for( i in 0...amount )
 			new Bunny( bunnies, tile, Math.random()*5, Math.random()*5-3 );
-		text.text = Std.string( bunnies.numChildren );
+		setInfoText( Std.string( bunnies.numChildren ) );
 	}
 
 	function removeBunnies() {
@@ -57,7 +62,15 @@ class Bunnymark extends hxd.App {
 			bunnies.removeChild( bunnies.getChildAt(0) );
 			i++;
 		}
-		text.text = Std.string( bunnies.numChildren );
+		setInfoText( Std.string( bunnies.numChildren ) );
+	}
+
+	function setInfoText( str : String ) {
+		text.text = str;
+		textBackground.clear();
+		textBackground.beginFill( 0xFFFFFF, 0.75 );
+		textBackground.drawRect( 0, 0, text.textWidth+5, text.textHeight );
+		textBackground.endFill();
 	}
 
 	function onEvent( e : hxd.Event ) {
