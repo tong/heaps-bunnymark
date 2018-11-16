@@ -1,17 +1,16 @@
 
 import hxd.Key;
-import h2d.Text.Align;
+import h2d.SpriteBatch;
 
-class Bunny extends h2d.Object {
+class Bunny extends h2d.BatchElement {
 
 	public var speedX : Float;
 	public var speedY : Float;
 
-	public function new( parent, tile, speedX : Float, speedY : Float ) {
-		super( parent );
+	public function new( tile, speedX : Float, speedY : Float ) {
+		super( tile );
 		this.speedX = speedX;
 		this.speedY = speedY;
-		new h2d.Bitmap( tile, this );
 	}
 }
 
@@ -20,7 +19,8 @@ class Bunnymark extends hxd.App {
 	var textBackground : h2d.Graphics;
 	var text : h2d.Text;
 	var tile : h2d.Tile;
-	var bunnies : h2d.Object;
+	var bunnies : h2d.SpriteBatch;
+	var bunnyCount = 0;
 	var bunnyWidth : Int;
 	var bunnyHeight : Int;
 	var gravity = 0.5;
@@ -34,9 +34,11 @@ class Bunnymark extends hxd.App {
 	override function init() {
 
 		tile = hxd.Res.bunny.toTile();
+
 		bunnyWidth = tile.width;
 		bunnyHeight = tile.height;
-		bunnies = new h2d.Object( s2d );
+
+		bunnies = new h2d.SpriteBatch( tile, s2d );
 
 		textBackground = new h2d.Graphics( s2d );
 		text = new h2d.Text( hxd.res.DefaultFont.get(), textBackground );
@@ -52,21 +54,47 @@ class Bunnymark extends hxd.App {
 
 	function addBunnies() {
 		for( i in 0...amount )
-			new Bunny( bunnies, tile, Math.random()*5, Math.random()*5-3 );
-		setInfoText( Std.string( bunnies.numChildren ) );
+			bunnies.add( new Bunny( tile, Math.random()*5, Math.random()*5-3 ) );
+		bunnyCount += amount;
+		updateInfoText();
 	}
 
 	function removeBunnies() {
 		var i = 0;
-		while( i < amount && bunnies.numChildren > 0 ) {
-			bunnies.removeChild( bunnies.getChildAt(0) );
-			i++;
+		for( bunny in bunnies.getElements() ) {
+			bunny.remove();
+			bunnyCount--;
+			if( ++i >= amount ) break;
 		}
-		setInfoText( Std.string( bunnies.numChildren ) );
+		updateInfoText();
 	}
 
-	function setInfoText( str : String ) {
-		text.text = str;
+	override function update(dt:Float) {
+		for( child in bunnies.getElements() ) {
+			var bunny : Bunny = cast child;
+			bunny.x += bunny.speedX;
+			bunny.y += bunny.speedY;
+			bunny.speedY += gravity;
+			if( bunny.x < minX ) {
+				bunny.x = minX;
+				bunny.speedX *= -1;
+			} else if( (bunny.x + bunnyWidth) > maxX ) {
+				bunny.x = maxX - bunnyWidth;
+				bunny.speedX *= -1;
+			}
+			if( bunny.y < minY ) {
+				bunny.y = minY;
+				bunny.speedY = 0;
+			} else if( (bunny.y + bunnyHeight) > maxY ) {
+				bunny.y = maxY - bunnyHeight;
+				bunny.speedY *= -0.85;
+				if( Math.random() > 0.5 ) bunny.speedY -= Math.random() * 6;
+			}
+		}
+	}
+
+	function updateInfoText( ) {
+		text.text = Std.string( bunnyCount );
 		textBackground.clear();
 		textBackground.beginFill( 0xFFFFFF, 0.75 );
 		textBackground.drawRect( 0, 0, text.textWidth+5, text.textHeight );
@@ -90,30 +118,6 @@ class Bunnymark extends hxd.App {
 		case EPush: (e.button == 0) ? addBunnies() : removeBunnies();
 		case EWheel: (e.wheelDelta > 0) ? addBunnies() : removeBunnies();
 		case _:
-		}
-	}
-
-	override function update(dt:Float) {
-		for( child in bunnies.iterator() ) {
-			var bunny = cast( child, Bunny );
-			bunny.x += bunny.speedX;
-			bunny.y += bunny.speedY;
-			bunny.speedY += gravity;
-			if( bunny.x < minX ) {
-				bunny.x = minX;
-				bunny.speedX *= -1;
-			} else if( (bunny.x + bunnyWidth) > maxX ) {
-				bunny.x = maxX - bunnyWidth;
-				bunny.speedX *= -1;
-			}
-			if( bunny.y < minY ) {
-				bunny.y = minY;
-				bunny.speedY = 0;
-			} else if( (bunny.y + bunnyHeight) > maxY ) {
-				bunny.y = maxY - bunnyHeight;
-				bunny.speedY *= -0.85;
-				if( Math.random() > 0.5 ) bunny.speedY -= Math.random() * 6;
-			}
 		}
 	}
 
