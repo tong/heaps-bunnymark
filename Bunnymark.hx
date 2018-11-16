@@ -40,10 +40,10 @@ class Bunnymark extends hxd.App {
 
 		textBackground = new h2d.Graphics( s2d );
 		text = new h2d.Text( hxd.res.DefaultFont.get(), textBackground );
-		text.text = "BUNNYMARK";
 		text.textColor = 0x000000;
 		text.x = 2;
-		textBackground.y = maxY - text.textHeight;
+
+		onResize();
 
 		addBunnies();
 
@@ -71,6 +71,13 @@ class Bunnymark extends hxd.App {
 		textBackground.beginFill( 0xFFFFFF, 0.75 );
 		textBackground.drawRect( 0, 0, text.textWidth+5, text.textHeight );
 		textBackground.endFill();
+	}
+
+	override function onResize() {
+		var window = hxd.Window.getInstance();
+		maxX = window.width;
+		maxY = window.height;
+		textBackground.y = maxY - text.textHeight;
 	}
 
 	function onEvent( e : hxd.Event ) {
