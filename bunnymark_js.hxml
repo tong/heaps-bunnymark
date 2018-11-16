@@ -1,0 +1,6 @@
+-js bunnymark.js
+-main Bunnymark
+-lib heaps
+-dce full
+-debug
+-D windowSize=600x600

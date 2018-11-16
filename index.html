@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0">
+		<title>Bunnymark</title>
+		<style media="screen">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+			body {
+				background: #141414;
+				color: #e0e0e0;
+				font-family: monospace;
+			}
+			a {
+				color: #e0e0e0;
+			}
+			canvas {
+				width: 600px;
+				height: 600px;
+			}
+			#info {
+				margin: 0.25em;
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="webgl"></canvas>
+		<div id="info">
+			<div>KeyU|MouseL|MouseWheelU: +100</div>
+			<div>KeyD|MouseR|MouseWheelD: -100</div>
+			<a href="https://github.com/tong/heaps-bunnymark">Source</a>
+			<a href="https://heaps.io/">Heaps</a>
+		</div>
+		<script src="bunnymark.js"></script>
+	</body>
+</html>
