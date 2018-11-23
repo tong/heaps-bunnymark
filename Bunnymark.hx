@@ -80,6 +80,11 @@ class Bunnymark extends hxd.App {
 			addBunnies();
 		if( Key.isDown( Key.UP ) || Key.isDown( Key.MOUSE_RIGHT ) )
 			removeBunnies();
+		if( Key.isDown( Key.MOUSE_MIDDLE ) ) {
+			bunnies.clear();
+			bunnyCount = 0;
+			updateInfoText();
+		}
 		for( child in bunnies.getElements() ) {
 			var bunny : Bunny = cast child;
 			bunny.x += bunny.speedX;
