@@ -52,13 +52,15 @@ class Bunnymark extends hxd.App {
 		onResize();
 
 		addBunnies();
-
-		hxd.Window.getInstance().addEventTarget( onEvent );
 	}
 
 	function addBunnies() {
-		for( i in 0...amount )
-			bunnies.add( new Bunny( tile, Math.random()*5, Math.random()*5-3 ) );
+		for( i in 0...amount ) {
+			var bunny = new Bunny( tile, Math.random()*10-5, Math.random()*5-3 );
+			bunny.x = s2d.mouseX;
+			bunny.y = s2d.mouseY;
+			bunnies.add( bunny );
+		}
 		bunnyCount += amount;
 		updateInfoText();
 	}
@@ -74,6 +76,10 @@ class Bunnymark extends hxd.App {
 	}
 
 	override function update(dt:Float) {
+		if( Key.isDown( Key.DOWN ) || Key.isDown( Key.MOUSE_LEFT ) )
+			addBunnies();
+		if( Key.isDown( Key.UP ) || Key.isDown( Key.MOUSE_RIGHT ) )
+			removeBunnies();
 		for( child in bunnies.getElements() ) {
 			var bunny : Bunny = cast child;
 			bunny.x += bunny.speedX;
@@ -109,19 +115,6 @@ class Bunnymark extends hxd.App {
 		var window = hxd.Window.getInstance();
 		maxX = window.width;
 		maxY = window.height;
-	}
-
-	function onEvent( e : hxd.Event ) {
-		switch e.kind {
-		case EKeyDown:
-			switch e.keyCode {
-			case Key.UP: addBunnies();
-			case Key.DOWN: removeBunnies();
-			}
-		case EPush: (e.button == 0) ? addBunnies() : removeBunnies();
-		case EWheel: (e.wheelDelta > 0) ? addBunnies() : removeBunnies();
-		case _:
-		}
 	}
 
 	static function main() {
