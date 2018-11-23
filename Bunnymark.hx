@@ -1,5 +1,6 @@
 
 import hxd.Key;
+import hxd.Res;
 import h2d.SpriteBatch;
 
 class Bunny extends h2d.BatchElement {
@@ -33,8 +34,7 @@ class Bunnymark extends hxd.App {
 
 	override function init() {
 
-		tile = hxd.Res.bunny.toTile();
-
+		tile = Res.load( 'bunny'+Std.int(Math.random()*5+1)+'.png' ).toTile();
 		bunnyWidth = tile.width;
 		bunnyHeight = tile.height;
 
