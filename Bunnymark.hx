@@ -3,42 +3,65 @@ import hxd.Key;
 import hxd.Res;
 import h2d.SpriteBatch;
 
-class Bunny extends h2d.BatchElement {
+class Bunny extends BatchElement {
 
-	public var speedX : Float;
-	public var speedY : Float;
+	var vx : Float;
+	var vy : Float;
+	var gravity = 0.5;
+	var width : Int;
+	var height : Int;
 
-	public function new( tile, speedX : Float, speedY : Float ) {
+	public function new( tile : h2d.Tile, vx : Float, vy : Float ) {
 		super( tile );
-		this.speedX = speedX;
-		this.speedY = speedY;
+		this.vx = vx;
+		this.vy = vy;
+		width = tile.width;
+		height = tile.height;
+	}
+
+	public override function update( dt : Float ) {
+		x += vx;
+		y += vy;
+		vy += gravity;
+		if( x < Bunnymark.minX ) {
+			x = Bunnymark.minX;
+			vx *= -1;
+		} else if( (x + width) > Bunnymark.maxX ) {
+			x = Bunnymark.maxX - width;
+			vx *= -1;
+		}
+		if( y < Bunnymark.minY ) {
+			y = Bunnymark.minY;
+			vy = 0;
+		} else if( (y + height) > Bunnymark.maxY ) {
+			y = Bunnymark.maxY - height;
+			vy *= -0.85;
+			if( Math.random() > 0.5 ) vy -= Math.random() * 6;
+		}
+		return true;
 	}
 }
 
 class Bunnymark extends hxd.App {
 
-	var textBackground : h2d.Graphics;
-	var text : h2d.Text;
+	public static var minX(default,null) = 0;
+	public static var minY(default,null) = 0;
+	public static var maxX(default,null) = 600;
+	public static var maxY(default,null) = 600;
+
 	var tile : h2d.Tile;
 	var bunnies : h2d.SpriteBatch;
-	var bunnyCount = 0;
-	var bunnyWidth : Int;
-	var bunnyHeight : Int;
-	var gravity = 0.5;
-	var minX = 0;
-	var minY = 0;
-	var maxX = 600;
-	var maxY = 600;
-	var isAdding : Bool;
+	var count = 0;
 	var amount = 100;
+	var text : h2d.Text;
+	var textBackground : h2d.Graphics;
 
 	override function init() {
 
-		tile = Res.load( 'bunny'+Std.int(Math.random()*5+1)+'.png' ).toTile();
-		bunnyWidth = tile.width;
-		bunnyHeight = tile.height;
+		var names = ["1","2","3","4","5","ash","batman","bb8","frankenstein","neo","sonic","spidey","stormtrooper","superman","tron","v3","wolverine"];
+		tile = Res.load( 'bunny_'+names[Std.int(Math.random()*names.length)]+".png" ).toTile();
 
-		bunnies = new h2d.SpriteBatch( tile, s2d );
+		bunnies = new SpriteBatch( tile, s2d );
 
 		var font = hxd.res.DefaultFont.get();
 		font.resizeTo( font.size * 2 );
@@ -61,7 +84,7 @@ class Bunnymark extends hxd.App {
 			bunny.y = s2d.mouseY;
 			bunnies.add( bunny );
 		}
-		bunnyCount += amount;
+		count += amount;
 		updateInfoText();
 	}
 
@@ -69,7 +92,7 @@ class Bunnymark extends hxd.App {
 		var i = 0;
 		for( bunny in bunnies.getElements() ) {
 			bunny.remove();
-			bunnyCount--;
+			count--;
 			if( ++i >= amount ) break;
 		}
 		updateInfoText();
@@ -82,34 +105,14 @@ class Bunnymark extends hxd.App {
 			removeBunnies();
 		if( Key.isDown( Key.MOUSE_MIDDLE ) ) {
 			bunnies.clear();
-			bunnyCount = 0;
+			count = 0;
 			updateInfoText();
 		}
-		for( child in bunnies.getElements() ) {
-			var bunny : Bunny = cast child;
-			bunny.x += bunny.speedX;
-			bunny.y += bunny.speedY;
-			bunny.speedY += gravity;
-			if( bunny.x < minX ) {
-				bunny.x = minX;
-				bunny.speedX *= -1;
-			} else if( (bunny.x + bunnyWidth) > maxX ) {
-				bunny.x = maxX - bunnyWidth;
-				bunny.speedX *= -1;
-			}
-			if( bunny.y < minY ) {
-				bunny.y = minY;
-				bunny.speedY = 0;
-			} else if( (bunny.y + bunnyHeight) > maxY ) {
-				bunny.y = maxY - bunnyHeight;
-				bunny.speedY *= -0.85;
-				if( Math.random() > 0.5 ) bunny.speedY -= Math.random() * 6;
-			}
-		}
+		for( c in bunnies.getElements() ) cast(c,Bunny).update( dt );
 	}
 
 	function updateInfoText( ) {
-		text.text = Std.string( bunnyCount );
+		text.text = Std.string( count );
 		textBackground.clear();
 		textBackground.beginFill( 0xFFFFFF, 0.75 );
 		textBackground.drawRect( 0, 0, text.textWidth+5, text.textHeight );
@@ -117,13 +120,13 @@ class Bunnymark extends hxd.App {
 	}
 
 	override function onResize() {
-		var window = hxd.Window.getInstance();
-		maxX = window.width;
-		maxY = window.height;
+		var win = hxd.Window.getInstance();
+		maxX = win.width;
+		maxY = win.height;
 	}
 
 	static function main() {
-		hxd.Res.initEmbed();
+		Res.initEmbed();
 		new Bunnymark();
 	}
 }
